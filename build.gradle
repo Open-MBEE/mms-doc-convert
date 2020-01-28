@@ -1,0 +1,56 @@
+plugins {
+	id 'org.springframework.boot' version '2.2.4.RELEASE'
+	id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+	id 'org.hidetake.swagger.generator' version '2.18.1'
+	id 'java'
+}
+
+group = 'org.openmbee'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '12'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter'
+	compile(
+		'org.springframework.boot:spring-boot-starter-web',
+		'org.springdoc:springdoc-openapi-ui:1.2.28',
+		'org.springdoc:springdoc-openapi-webmvc-core:1.2.28',
+		'org.springdoc:springdoc-openapi-common:1.2.28'
+	)
+	testImplementation('org.springframework.boot:spring-boot-starter-test') {
+		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+	}
+	swaggerCodegen 'org.openapitools:openapi-generator-cli:4.2.2'
+}
+
+test {
+	useJUnitPlatform()
+}
+
+swaggerSources {
+	python {
+		inputFile = file('openapi/api-docs.yaml')
+		code {
+			language = 'python'
+			configFile = file('openapi/python-config.json')
+		}
+	}
+	java {
+		inputFile = file('openapi/api-docs.yaml')
+		code {
+			language = 'java'
+			configFile = file('openapi/java-config.json')
+		}
+	}
+	doc {
+		inputFile = file('openapi/api-docs.yaml')
+		code {
+			language = 'html2'
+			configFile = file('openapi/doc-config.json')
+		}
+	}
+}
