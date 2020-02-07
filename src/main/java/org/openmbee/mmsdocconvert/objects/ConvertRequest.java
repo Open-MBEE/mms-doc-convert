@@ -34,7 +34,7 @@ public class ConvertRequest {
         this.user = user;
     }
 
-    @Schema(description = "Base64 Encoded HTML to convert", required = true)
+    @Schema(description = "HTML to convert", required = true)
     public String getHtml() {
         return html;
     }
@@ -43,7 +43,7 @@ public class ConvertRequest {
         this.html = html;
     }
 
-    @Schema(description = "Base64 Encoded CSS to convert", required = false)
+    @Schema(description = "CSS to convert", required = false)
     public String getCss() {
         return css;
     }

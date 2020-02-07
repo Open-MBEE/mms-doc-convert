@@ -31,23 +31,20 @@ public class ConvertService {
     @Value("${pandoc.output.file:output}")
     private String PANDOC_OUTPUT_FILE;
 
-    private String fileName;
-
     public ConvertService() {
     }
 
-    public void setFileName(String inputString, OutputFormat outputFormat) {
+    public static String getFileName(String inputString, OutputFormat outputFormat) {
         String title = StringUtils.substringBetween(inputString, "<title>", "</title>");
         if (title == null) {
-            throw new RuntimeException("No title in HTML");
+            title = "Untitled";
         }
-        fileName = String.format("%s.%s", title.replaceAll("\\W+", "_"), outputFormat.name());
+        return String.format("%s.%s", title.replaceAll("\\W+", "_"), outputFormat.name());
     }
 
     public byte[] convert(String inputString, String cssString, OutputFormat outputFormat) {
-        setFileName(inputString, outputFormat);
         File tempFile = null;
-        String outputFile = String.format("%s/%s", PANDOC_DATA_DIR, getFileName());
+        String outputFile = String.format("%s/%s", PANDOC_DATA_DIR, getFileName(inputString, outputFormat));
 
         int status = 0;
         StringBuilder command = new StringBuilder();
@@ -93,9 +90,5 @@ public class ConvertService {
                         "Conversion failed with status code: " + status + ". Command executed: " + command.toString());
             }
         }
-    }
-
-    public String getFileName() {
-        return fileName;
     }
 }
