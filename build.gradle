@@ -2,6 +2,7 @@ plugins {
 	id 'org.springframework.boot' version '2.2.4.RELEASE'
 	id 'io.spring.dependency-management' version '1.0.9.RELEASE'
 	id 'org.hidetake.swagger.generator' version '2.18.1'
+	id 'com.palantir.docker' version '0.25.0'
 	id 'java'
 }
 
@@ -14,8 +15,8 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter'
-	compile(
+	implementation(
+		'org.springframework.boot:spring-boot-starter',
 		'org.springframework.boot:spring-boot-starter-web',
 		'org.springdoc:springdoc-openapi-ui:1.2.28',
 		'org.springdoc:springdoc-openapi-webmvc-core:1.2.28',
@@ -57,4 +58,17 @@ swaggerSources {
 
 test {
 	exclude '**/*'
+}
+
+docker {
+	name 'mms-doc-convert:latest'
+	files tasks.jar.outputs.files.singleFile
+	dockerfile file('Dockerfile')
+}
+
+build.mustRunAfter 'clean'
+
+task buildDocker {
+	dependsOn build
+	finalizedBy docker
 }
