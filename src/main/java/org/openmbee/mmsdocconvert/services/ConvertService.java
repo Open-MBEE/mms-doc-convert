@@ -13,37 +13,41 @@ public class ConvertService {
 
     private OutputFormat outputFormat;
 
-    @Value("${pandoc.exec}")
+    @Value("${pandoc.exec:pandoc}")
     private String pandocExec;
 
-    @Value("${pandoc.pdfengine}")
+    @Value("${pandoc.pdfengine:weasyprint}")
     private String pdfEngine;
 
-    @Value("${pandoc.princeexec}")
+    @Value("${pandoc.princeexec:}")
     private String princeExec;
 
-    @Value("${pandoc.output.dir}")
+    @Value("${pandoc.output.dir:/tmp}")
     public String PANDOC_DATA_DIR;
 
-    @Value("${pandoc.output.csstmp}")
+    @Value("${pandoc.output.csstmp:css}")
     private String PANDOC_OUTPUT_CSSTMP;
 
-    @Value("${pandoc.output.file}")
+    @Value("${pandoc.output.file:output}")
     private String PANDOC_OUTPUT_FILE;
+
+    private String fileName;
 
     public ConvertService() {
     }
 
-    public byte[] convert(String inputString, String cssString, OutputFormat outputFormat) {
-
+    public void setFileName(String inputString, OutputFormat outputFormat) {
         String title = StringUtils.substringBetween(inputString, "<title>", "</title>");
         if (title == null) {
             throw new RuntimeException("No title in HTML");
-        } else {
-            title += System.lineSeparator();
         }
+        fileName = String.format("%s.%s", title.replaceAll("\\W+", "_"), outputFormat.name());
+    }
 
+    public byte[] convert(String inputString, String cssString, OutputFormat outputFormat) {
+        setFileName(inputString, outputFormat);
         File tempFile = null;
+        String outputFile = String.format("%s/%s", PANDOC_DATA_DIR, getFileName());
 
         int status = 0;
         StringBuilder command = new StringBuilder();
@@ -63,7 +67,7 @@ public class ConvertService {
         if (outputFormat.name().equals("pdf")) {
             command.append(String.format(" --pdf-engine=%s", this.pdfEngine));
         }
-        command.append(String.format(" -o %s/%s.%s", PANDOC_DATA_DIR, PANDOC_OUTPUT_FILE, outputFormat.name()));
+        command.append(String.format(" -o %s", outputFile));
 
         try {
             Process process = Runtime.getRuntime().exec(command.toString());
@@ -72,7 +76,7 @@ public class ConvertService {
             out.flush();
             out.close();
             status = process.waitFor();
-            File pdfFile = new File(PANDOC_DATA_DIR + File.separator + PANDOC_OUTPUT_FILE);
+            File pdfFile = new File(outputFile);
             return Files.readAllBytes(pdfFile.toPath());
         } catch (InterruptedException ex) {
             throw new RuntimeException("Could not execute: " + command.toString(), ex);
@@ -89,5 +93,9 @@ public class ConvertService {
                         "Conversion failed with status code: " + status + ". Command executed: " + command.toString());
             }
         }
+    }
+
+    public String getFileName() {
+        return fileName;
     }
 }

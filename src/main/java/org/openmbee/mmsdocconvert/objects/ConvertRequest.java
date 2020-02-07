@@ -3,6 +3,7 @@ package org.openmbee.mmsdocconvert.objects;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(name="ConvertRequest")
@@ -12,12 +13,16 @@ public class ConvertRequest {
     private String css;
     private OutputFormat format;
 
+    public static final String APPLICATION_PDF = "pdf";
+    public static final String APPLICATION_DOCX = "vnd.openxmlformats-officedocument.wordprocessingml.document";
+    public static final String APPLICATION_LATEX = "latex";
+
     @JsonCreator
-    public ConvertRequest(@JsonProperty("user") String user, @JsonProperty("html") String html, @JsonProperty("css") String css, @JsonProperty("format") OutputFormat format)  {
-        this.user = user;
-        this.html = html;
-        this.css = css;
-        this.format = format;
+    public ConvertRequest(@JsonProperty("user") String user, @JsonProperty("html") String html, @JsonProperty("css") String css, @JsonProperty("format") String format)  {
+        setUser(user);
+        setHtml(html);
+        setCss(css);
+        setFormat(format);
     }
 
     @Schema(description = "User initiating request", required = true)
@@ -52,13 +57,13 @@ public class ConvertRequest {
         return format;
     }
 
-    public void setFormat(OutputFormat format) {
-        this.format = format;
+    public void setFormat(String formatString) {
+        this.format = OutputFormat.valueOf(formatString.toLowerCase());
     }
 
     @JsonFormat(shape = JsonFormat.Shape.OBJECT)
     public enum OutputFormat {
-        docx("application/pdf"), pdf("application/pdf"), latex("application/latex");
+        docx(ConvertRequest.APPLICATION_DOCX), pdf(ConvertRequest.APPLICATION_PDF), latex(ConvertRequest.APPLICATION_LATEX);
 
         private String formatName;
 
@@ -66,19 +71,19 @@ public class ConvertRequest {
             this.formatName = name;
         }
 
+        @JsonValue
         public String getFormatName() {
             return formatName;
         }
 
-        public static boolean exists(String find) {
+        public static String getContentType(String find) {
 
             for (OutputFormat c : OutputFormat.values()) {
                 if (c.getFormatName().equals(find)) {
-                    return true;
+                    return c.toString();
                 }
             }
-
-            return false;
+            return null;
         }
 
     }
