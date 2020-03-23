@@ -70,5 +70,5 @@ build.mustRunAfter 'clean'
 
 task buildDocker {
 	dependsOn build
-	finalizedBy docker
+	finalizedBy tasks.docker
 }
