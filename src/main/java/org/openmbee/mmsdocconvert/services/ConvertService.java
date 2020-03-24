@@ -50,7 +50,7 @@ public class ConvertService {
         StringBuilder command = new StringBuilder();
 
         command.append(String.format("%s --mathml --variable=title: --from=html+raw_html+simple_tables", this.pandocExec));
-        if (!cssString.isEmpty()) {
+        if (cssString != null && !cssString.isEmpty()) {
             try {
                 tempFile = new File(PANDOC_DATA_DIR + File.separator + PANDOC_OUTPUT_CSSTMP);
                 OutputStream out = new FileOutputStream(tempFile);

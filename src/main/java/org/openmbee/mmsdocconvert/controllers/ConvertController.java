@@ -29,9 +29,9 @@ public class ConvertController {
 
     @RequestMapping(value = "/convert", method = RequestMethod.POST)
     @Operation(operationId = "convertRequest", summary = "Request document conversion", description = "Converts requested HTML and CSS into request output format")
-    @ApiResponse(content = @Content(mediaType = "application/pdf"), description = "PDF File Response")
-    @ApiResponse(content = @Content(mediaType = "application/latex"), description = "Latex File Response")
-    @ApiResponse(content = @Content(mediaType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"), description = "Word Document File Response")
+    @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/latex"), description = "Latex File Response")
+    @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"), description = "Word Document File Response")
+    @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/pdf"), description = "PDF File Response")
     @ApiResponse(responseCode = "400", description = "Bad request")
     public @ResponseBody HttpEntity<byte[]> index(@RequestBody ConvertRequest convertRequest) {
         logger.debug(convertRequest.getUser() + " " + convertRequest.getHtml());
@@ -39,7 +39,7 @@ public class ConvertController {
         byte[] document = convertService.convert(convertRequest.getHtml(), convertRequest.getCss(), convertRequest.getFormat());
         HttpHeaders header = new HttpHeaders();
         header.setContentType(new MediaType("application", convertRequest.getFormat().getFormatName()));
-        header.set("Content-Disposition", "inline; filename=" + fileName);
+        header.set("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
         header.setContentLength(document.length);
 
         return new HttpEntity<>(document, header);

@@ -25,7 +25,7 @@ public class ConvertRequest {
         setFormat(format);
     }
 
-    @Schema(description = "User initiating request", required = true)
+    @Schema(description = "User initiating request", required = false)
     public String getUser() {
         return user;
     }
@@ -52,7 +52,7 @@ public class ConvertRequest {
         this.css = css;
     }
 
-    @Schema(description = "Target format for output", required = false)
+    @Schema(description = "Target format for output", required = true)
     public OutputFormat getFormat() {
         return format;
     }
