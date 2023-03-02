@@ -1,9 +1,8 @@
-spring.jackson.mapper.ACCEPT_CASE_INSENSITIVE_ENUMS = true
 #Pandoc Settings
 pandoc.output.dir=/tmp
 pandoc.output.csstmp=tmp.css
 pandoc.output.file=tmp.output
-pandoc.exec=/usr/local/pandoc/bin/pandoc
-pandoc.pdfengine=weasyprint
-#pandoc.pdfengine=prince
+pandoc.exec=/usr/local/bin/pandoc
+#pandoc.pdfengine=weasyprint
+pandoc.pdfengine=prince
 pandoc.princeexec=/usr/local/bin/prince
