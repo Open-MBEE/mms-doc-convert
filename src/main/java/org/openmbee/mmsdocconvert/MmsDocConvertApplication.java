@@ -6,6 +6,8 @@ import io.swagger.v3.oas.annotations.info.License;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.util.Properties;
+
 @SpringBootApplication(scanBasePackages = "org.openmbee")
 @OpenAPIDefinition(
 		info = @Info(
@@ -20,7 +22,14 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class MmsDocConvertApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(MmsDocConvertApplication.class, args);
+		SpringApplication application = new SpringApplication(MmsDocConvertApplication.class);
+
+		Properties properties = new Properties();
+		properties.put("spring.main.allow-circular-references", true);
+		properties.put("spring.jackson.mapper.ACCEPT_CASE_INSENSITIVE_ENUMS", true);
+		application.setDefaultProperties(properties);
+
+		application.run(args);
 	}
 
 }
