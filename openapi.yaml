@@ -1,0 +1,53 @@
+openapi: 3.0.1
+info:
+  title: MMS Document Convert API
+  description: Documentation for MMS Document Convert API
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.txt
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Generated server url
+paths:
+  /convert:
+    post:
+      tags:
+        - convert-controller
+      summary: Request document conversion
+      description: Converts requested HTML and CSS into request output format
+      operationId: convertRequest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConvertRequest'
+      responses:
+        '200':
+          description: PDF File Response
+          content:
+            application/pdf: {}
+components:
+  schemas:
+    ConvertRequest:
+      required:
+        - format
+        - html
+      type: object
+      properties:
+        user:
+          type: string
+          description: User initiating request
+        html:
+          type: string
+          description: HTML to convert
+        css:
+          type: string
+          description: CSS to convert
+        format:
+          type: string
+          description: Target format for output
+          enum:
+            - docx
+            - pdf
+            - latex
