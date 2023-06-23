@@ -68,7 +68,7 @@ public class ConvertService {
             command.append(String.format(" --pdf-engine=%s", this.pdfEngine));
         }
         if (!pdfEngineOpt.equals("")) {
-            command.append(String.format(" --pdf-engine-opt=%s", this.pdfEngine));
+            command.append(String.format(" --pdf-engine-opt=%s", this.pdfEngineOpt));
         }
         command.append(String.format(" -o %s", outputFile));
 
