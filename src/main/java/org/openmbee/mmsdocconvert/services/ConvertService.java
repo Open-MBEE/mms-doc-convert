@@ -19,6 +19,9 @@ public class ConvertService {
     @Value("${pandoc.pdfengine:weasyprint}")
     private String pdfEngine;
 
+    @Value("${pandoc.pdfengineopt:}")
+    private String pdfEngineOpt;
+
     @Value("${pandoc.princeexec:}")
     private String princeExec;
 
@@ -63,6 +66,9 @@ public class ConvertService {
         }
         if (outputFormat.name().equals("pdf")) {
             command.append(String.format(" --pdf-engine=%s", this.pdfEngine));
+        }
+        if (!pdfEngineOpt.equals("")) {
+            command.append(String.format(" --pdf-engine-opt=%s", this.pdfEngine));
         }
         command.append(String.format(" -o %s", outputFile));
 

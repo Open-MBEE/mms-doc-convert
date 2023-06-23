@@ -5,4 +5,5 @@ pandoc.output.file=tmp.output
 pandoc.exec=/usr/local/bin/pandoc
 #pandoc.pdfengine=weasyprint
 pandoc.pdfengine=prince
+pandoc.pdfengineopt=
 pandoc.princeexec=/usr/local/bin/prince
