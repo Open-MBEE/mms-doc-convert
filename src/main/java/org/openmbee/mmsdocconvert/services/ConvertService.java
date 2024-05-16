@@ -101,17 +101,18 @@ public class ConvertService {
     }
 
     public byte[] convertPrince(String inputString, String cssString, String outputFile) {
-        File tempFile;
+        File tempFile = null;
+        File cssFile = null;
         StringBuilder command = new StringBuilder();
 
         command.append(String.format("%s", this.princeExec));
         try {
             if (cssString != null && !cssString.isEmpty()) {
-                tempFile = new File(PANDOC_DATA_DIR + File.separator + PANDOC_OUTPUT_CSSTMP);
-                OutputStream out = new FileOutputStream(tempFile);
+                cssFile = new File(PANDOC_DATA_DIR + File.separator + PANDOC_OUTPUT_CSSTMP);
+                OutputStream out = new FileOutputStream(cssFile);
                 out.write(cssString.getBytes());
                 out.close();
-                command.append(String.format(" -s %s", tempFile.toPath().toString()));
+                command.append(String.format(" -s %s", cssFile.toPath().toString()));
             }
             tempFile = new File(outputFile.replaceAll("pdf", "html"));
             OutputStream out = new FileOutputStream(tempFile);
@@ -125,6 +126,9 @@ public class ConvertService {
             return Files.readAllBytes(pdfFile.toPath());
         } catch (Throwable e) {
             throw new RuntimeException(e);
+        } finally {
+            if (tempFile != null) tempFile.delete();
+            if (cssFile != null) cssFile.delete();
         }
     }
 }
