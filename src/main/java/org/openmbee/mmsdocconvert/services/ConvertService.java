@@ -108,7 +108,7 @@ public class ConvertService {
         command.append(String.format("%s", this.princeExec));
         try {
             if (cssString != null && !cssString.isEmpty()) {
-                cssFile = new File(PANDOC_DATA_DIR + File.separator + PANDOC_OUTPUT_CSSTMP);
+                cssFile = new File(outputFile.replaceAll("pdf", "css"));
                 OutputStream out = new FileOutputStream(cssFile);
                 out.write(cssString.getBytes());
                 out.close();
