@@ -48,7 +48,9 @@ public class ConvertService {
     public byte[] convert(String inputString, String cssString, OutputFormat outputFormat) {
         File tempFile = null;
         String outputFile = String.format("%s/%s", PANDOC_DATA_DIR, getFileName(inputString, outputFormat));
-
+        if (outputFormat.equals(OutputFormat.pdf) && this.pdfEngine.equals("prince")) {
+            return convertPrince(inputString, cssString, outputFile);
+        }
         int status = 0;
         StringBuilder command = new StringBuilder();
 
@@ -95,6 +97,34 @@ public class ConvertService {
                 throw new RuntimeException(
                         "Conversion failed with status code: " + status + ". Command executed: " + command.toString());
             }
+        }
+    }
+
+    public byte[] convertPrince(String inputString, String cssString, String outputFile) {
+        File tempFile;
+        StringBuilder command = new StringBuilder();
+
+        command.append(String.format("%s", this.princeExec));
+        try {
+            if (cssString != null && !cssString.isEmpty()) {
+                tempFile = new File(PANDOC_DATA_DIR + File.separator + PANDOC_OUTPUT_CSSTMP);
+                OutputStream out = new FileOutputStream(tempFile);
+                out.write(cssString.getBytes());
+                out.close();
+                command.append(String.format(" -s %s", tempFile.toPath().toString()));
+            }
+            tempFile = new File(outputFile.replaceAll("pdf", "html"));
+            OutputStream out = new FileOutputStream(tempFile);
+            out.write(inputString.getBytes());
+            out.close();
+            command.append(String.format(" %s", tempFile.toPath().toString()));
+            command.append(String.format(" -o %s", outputFile));
+            Process process = Runtime.getRuntime().exec(command.toString());
+            process.waitFor();
+            File pdfFile = new File(outputFile);
+            return Files.readAllBytes(pdfFile.toPath());
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
         }
     }
 }
