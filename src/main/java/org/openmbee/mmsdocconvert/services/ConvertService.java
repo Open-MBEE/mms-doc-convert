@@ -104,7 +104,7 @@ public class ConvertService {
         File tempFile = null;
         File cssFile = null;
         StringBuilder command = new StringBuilder();
-
+        int status = 0;
         command.append(String.format("%s", this.princeExec));
         try {
             if (cssString != null && !cssString.isEmpty()) {
@@ -121,7 +121,7 @@ public class ConvertService {
             command.append(String.format(" %s", tempFile.toPath().toString()));
             command.append(String.format(" -o %s", outputFile));
             Process process = Runtime.getRuntime().exec(command.toString());
-            process.waitFor();
+            status = process.waitFor();
             File pdfFile = new File(outputFile);
             return Files.readAllBytes(pdfFile.toPath());
         } catch (Throwable e) {
@@ -129,6 +129,10 @@ public class ConvertService {
         } finally {
             if (tempFile != null) tempFile.delete();
             if (cssFile != null) cssFile.delete();
+            if (status != 0) {
+                throw new RuntimeException(
+                        "Conversion failed with status code: " + status + ". Command executed: " + command.toString());
+            }
         }
     }
 }
