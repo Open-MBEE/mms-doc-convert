@@ -48,7 +48,9 @@ public class ConvertService {
     public byte[] convert(String inputString, String cssString, OutputFormat outputFormat) {
         File tempFile = null;
         String outputFile = String.format("%s/%s", PANDOC_DATA_DIR, getFileName(inputString, outputFormat));
-
+        if (outputFormat.equals(OutputFormat.pdf) && this.pdfEngine.equals("prince")) {
+            return convertPrince(inputString, cssString, outputFile);
+        }
         int status = 0;
         StringBuilder command = new StringBuilder();
 
@@ -91,6 +93,42 @@ public class ConvertService {
             if (tempFile != null && !tempFile.delete()) {
                 throw new RuntimeException("Could not delete temporary css file");
             }
+            if (status != 0) {
+                throw new RuntimeException(
+                        "Conversion failed with status code: " + status + ". Command executed: " + command.toString());
+            }
+        }
+    }
+
+    public byte[] convertPrince(String inputString, String cssString, String outputFile) {
+        File tempFile = null;
+        File cssFile = null;
+        StringBuilder command = new StringBuilder();
+        int status = 0;
+        command.append(String.format("%s", this.princeExec));
+        try {
+            if (cssString != null && !cssString.isEmpty()) {
+                cssFile = new File(outputFile.replaceAll("pdf", "css"));
+                OutputStream out = new FileOutputStream(cssFile);
+                out.write(cssString.getBytes());
+                out.close();
+                command.append(String.format(" -s %s", cssFile.toPath().toString()));
+            }
+            tempFile = new File(outputFile.replaceAll("pdf", "html"));
+            OutputStream out = new FileOutputStream(tempFile);
+            out.write(inputString.getBytes());
+            out.close();
+            command.append(String.format(" %s", tempFile.toPath().toString()));
+            command.append(String.format(" -o %s", outputFile));
+            Process process = Runtime.getRuntime().exec(command.toString());
+            status = process.waitFor();
+            File pdfFile = new File(outputFile);
+            return Files.readAllBytes(pdfFile.toPath());
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (tempFile != null) tempFile.delete();
+            if (cssFile != null) cssFile.delete();
             if (status != 0) {
                 throw new RuntimeException(
                         "Conversion failed with status code: " + status + ". Command executed: " + command.toString());
